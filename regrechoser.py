@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
-from scipy.stats import f
+from scipy.stats import f,t
 
 
 data = pd.read_excel('../encuestas.xlsx')
@@ -83,10 +83,6 @@ def get_sigmasq(ssr, n):
         sigmasq = ssr/(n-2)
         return(sigmasq)
 
-def get_se_estimators(sigmasq, est):
-        se = math.sqrt(sigmasq)/ \
-                math.sqrt(sum([(elem-(sum(est)/len(est)))**2 for elem in est]))
-        return(se)
 
 def f_contrast(ssr, ssrh0, n, k):
     '''
@@ -96,9 +92,13 @@ def f_contrast(ssr, ssrh0, n, k):
     pvalue = f.pdf(fvalue, k-1, n-k)
     return(pvalue)
 
-#def t_contrast():
+def t_contrast(estimator, se_estimator, n, k):
+        tvalue = estimator/se_estimator
+        pvalue = t.pdf(tvalue, n-k)
+        return(float(pvalue))
         
-
+        
+        
 def r2(sse, sst):
     r2 = (sse/sst)
     return(r2)
@@ -106,6 +106,7 @@ def r2(sse, sst):
 
 Y = data[y]
 X = np.matrix(get_X_matrix(data, x))
+var_matrix = np.linalg.inv(np.transpose(X)*X)
 
 n = len(Y)
 k = len(x)+1
@@ -128,13 +129,8 @@ sigmasq = get_sigmasq(ssr, n)
 sigma = math.sqrt(sigmasq)
 
 
-X = get_X_matrix(data, x)
-se = [get_se_estimators(sigmasq, est=X[est]) for est in X]
+var_estimators = [(var_matrix[i,i]*sigmasq) for i in range(len(x)+1)]
+se_estimators = [math.sqrt(var) for var in var_estimators]
 
+tvalues = [t_contrast(estimator=B[i], se_estimator=se_estimators[i], n=n, k=k) for i in range(len(se_estimators))]
 
-se=[X[est] for est in X]
-get_se_estimators(sigmasq, est=se[1])
-
-
-
-[print(X[est]) for est in pd.DataFrame(X)]

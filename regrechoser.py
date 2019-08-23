@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import f
 
 
-data = pd.read_excel('encuestas.xlsx')
+data = pd.read_excel('../encuestas.xlsx')
 y = "PSOE"
 x = ["VOX_busc", "Ciudadanos_busc"]
 
@@ -42,7 +42,7 @@ def get_VE(estimation, Y):
     return(ve)
 
 
-def get_VNE(estimation, Y):
+def get_sse(estimation, Y):
     '''
     Returns the part of the variance that can not be explained by the model.
     '''
@@ -66,20 +66,24 @@ def get_y_variance(vt, n):
     return(yvariance)
 
 
-def get_y_residual_variance(vne, n, k):
+def get_y_residual_variance(sse, n, k):
     '''
     Returns y residual variance.
     '''
-    residual_yvariance = vne/(n-k-1)
+    residual_yvariance = sse/(n-k-1)
     return(residual_yvariance)
 
 
-def f_contrast(ve, residual_var, n, k):
+def get_sseh0(Y, B):
+        sseh0 = float(sum([(Y[i]-B[0])**2 for i in range(len(Y))]))
+        return(sseh0)
+
+def f_contrast(sse, sseh0, n, k):
     '''
     Returns p-value for F_contrast: H0: b0 = b1 = b2 = ... = bn = 0
     '''
-    fvalue = ve/residual_var
-    pvalue = f.pdf(fvalue, 1, n-(k+1))
+    fvalue = ((sseh0-sse)/(k-1))/(sse/(n-k))
+    pvalue = f.pdf(fvalue, k-1, n-k)
     return(pvalue)
 
 
@@ -92,17 +96,18 @@ Y = data[y]
 X = np.matrix(get_X_matrix(data, x))
 
 n = len(Y)
-k = len(x)
+k = len(x)+1
 
 B = get_estimators(X, Y)
 estimation = get_estimation(B, X)
 
 ve = get_VE(estimation=estimation, Y=Y)
-vne = get_VNE(Y, estimation)
+vne = get_sse(Y, estimation)
 vt = get_VT(Y)
 
 var = get_y_variance(vt, n)
 residual_var = get_y_residual_variance(vt, n, k)
 
-fvalue = f_contrast(ve, residual_var, n, k)
+vneh0 = get_sseh0(Y, B)
+fvalue = f_contrast(vne, vneh0, n, k)
 r2 = r2(ve, vt)

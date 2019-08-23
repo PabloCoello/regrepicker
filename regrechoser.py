@@ -35,20 +35,20 @@ def get_estimation(B, X):
     return(estimation)
 
 
-def get_ssr(estimation, Y):
+def get_sse(estimation, Y):
     '''
     Returns the part of the variance explained by the model.
     '''
-    ssr = sum([(estimation[i]-(sum(Y)/len(Y)))**2 for i in range(len(Y))])
-    return(ssr)
+    sse = sum([(estimation[i]-(sum(Y)/len(Y)))**2 for i in range(len(Y))])
+    return(sse)
 
 
-def get_sse(estimation, Y):
+def get_ssr(estimation, Y):
     '''
     Returns the part of the variance that can not be explained by the model.
     '''
-    sse = sum([(Y[i]-estimation[i])**2 for i in range(len(Y))])
-    return(sse)
+    ssr = sum([(Y[i]-estimation[i])**2 for i in range(len(Y))])
+    return(ssr)
 
 
 def get_sst(Y):
@@ -67,17 +67,17 @@ def get_y_variance(sst, n):
     return(yvariance)
 
 
-def get_y_residual_variance(sse, n, k):
+def get_y_residual_variance(ssr, n, k):
     '''
     Returns y residual variance.
     '''
-    residual_yvariance = sse/(n-k-1)
+    residual_yvariance = ssr/(n-k-1)
     return(residual_yvariance)
 
 
-def get_sseh0(Y, B):
-        sseh0 = float(sum([(Y[i]-B[0])**2 for i in range(len(Y))]))
-        return(sseh0)
+def get_ssrh0(Y, B):
+        ssrh0 = float(sum([(Y[i]-B[0])**2 for i in range(len(Y))]))
+        return(ssrh0)
 
 def get_sigmasq(ssr, n):
         sigmasq = ssr/(n-2)
@@ -85,14 +85,14 @@ def get_sigmasq(ssr, n):
 
 def get_se_estimators(sigmasq, est):
         se = math.sqrt(sigmasq)/ \
-                math.sqrt(sum([elem-(sum(est)/len(est) for elem in est)]))
+                math.sqrt(sum([(elem-(sum(est)/len(est)))**2 for elem in est]))
         return(se)
 
-def f_contrast(sse, sseh0, n, k):
+def f_contrast(ssr, ssrh0, n, k):
     '''
     Returns p-value for F_contrast: H0: b0 = b1 = b2 = ... = bn = 0
     '''
-    fvalue = ((sseh0-sse)/(k-1))/(sse/(n-k))
+    fvalue = ((ssrh0-ssr)/(k-1))/(ssr/(n-k))
     pvalue = f.pdf(fvalue, k-1, n-k)
     return(pvalue)
 
@@ -100,7 +100,7 @@ def f_contrast(sse, sseh0, n, k):
         
 
 def r2(sse, sst):
-    r2 = 1-(sse/sst)
+    r2 = (sse/sst)
     return(r2)
 
 
@@ -114,15 +114,27 @@ B = get_estimators(X, Y)
 estimation = get_estimation(B, X)
 
 ssr = get_ssr(estimation=estimation, Y=Y)
-sse = get_sse(Y, estimation)
+sse = get_sse(estimation, Y)
 sst = get_sst(Y)
 
 var = get_y_variance(sst, n)
 residual_var = get_y_residual_variance(sst, n, k)
 
-vneh0 = get_sseh0(Y, B)
-fvalue = f_contrast(vne, vneh0, n, k)
+ssrh0 = get_ssrh0(Y, B)
+fvalue = f_contrast(ssr, ssrh0, n, k)
 r2 = r2(sse, sst)
 
 sigmasq = get_sigmasq(ssr, n)
 sigma = math.sqrt(sigmasq)
+
+
+X = get_X_matrix(data, x)
+se = [get_se_estimators(sigmasq, est=X[est]) for est in X]
+
+
+se=[X[est] for est in X]
+get_se_estimators(sigmasq, est=se[1])
+
+
+
+[print(X[est]) for est in pd.DataFrame(X)]

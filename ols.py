@@ -6,6 +6,9 @@ from scipy.stats import f,t
 
 
 class ols:
+        '''
+        Methods for OLS estimation.
+        '''
         def __init__(self, data, y, x):
                 self.data_ = data
                 self.y_ = y
@@ -40,6 +43,9 @@ class ols:
                 self.tvalues = [self.t_contrast(i=i) for i in range(len(self.se_estimators))]
         
         def get_X_matrix(self):
+                '''
+                Returns regressor matrix.
+                '''
                 X = self.data_[x].assign(a=1)
                 cols = X.columns.tolist()
                 cols = cols[-1:]+cols[:-1]
@@ -106,6 +112,9 @@ class ols:
 
 
         def get_ssrh0(self):
+                '''
+                Returns ssr under h0:b1=b2=...=bn=0
+                '''
                 ssrh0 = float(sum([(self.Y[i]-self.B[0])**2 for i in range(len(self.Y))]))
                 return(ssrh0)
 
@@ -125,12 +134,18 @@ class ols:
 
 
         def t_contrast(self, i):
+                '''
+                Returns p-value for t_contrast of individual significance of regressors.
+                '''
                 tvalue = self.B[i]/self.se_estimators
                 pvalue = t.pdf(tvalue, self.n-self.k)
                 return(pvalue)
                 
                       
         def r2(self):
+                '''
+                Returns R squared of the regression.
+                '''
                 r2 = (self.sse/self.sst)
                 return(r2)
 
@@ -143,3 +158,4 @@ if __name__ == '__main__':
 
         ls = ols(data, y, x)
         ls.estimation
+        ls.B

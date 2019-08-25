@@ -125,7 +125,7 @@ class ols:
 
 
         def get_sigmasq(self):
-                sigmasq = self.ssr/(self.n-2)
+                sigmasq = self.ssr/(self.n-(self.k+1))
                 return(sigmasq)
 
 
@@ -133,8 +133,8 @@ class ols:
                 '''
                 Returns p-value for F_contrast: H0: b0 = b1 = b2 = ... = bn = 0
                 '''
-                fvalue = ((self.ssrh0-self.ssr)/(self.k-1))/(self.ssr/(self.n-self.k))
-                pvalue = f.pdf(fvalue, self.k-1, self.n-self.k)
+                fvalue = (self.ssr)/(self.n)/(self.ssrh0/(self.n))
+                pvalue = f.pdf(fvalue, self.k, self.n-self.k+1)
                 return(pvalue)
 
 

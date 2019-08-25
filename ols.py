@@ -206,7 +206,7 @@ class ols:
 if __name__ == '__main__':
         data = pd.read_excel('../DATA/encuestas.xlsx')
         y = "PSOE"
-        x = ["VOX_busc", "Ciudadanos_busc"]
+        x = ["VOX_busc", "Ciudadanos_busc", "Podemos_busc"]
 
         ls = ols(data, y, x)
         ls.summary()

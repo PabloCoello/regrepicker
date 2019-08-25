@@ -37,10 +37,10 @@ class ols:
                 self.sigmasq = self.get_sigmasq()
                 self.sigma = math.sqrt(self.sigmasq)
 
-                self.var_estimators = [(self.var_matrix[i,i]*self.sigmasq) for i in range(len(self.x_)+1)]
-                self.se_estimators = [math.sqrt(self.var) for var in self.var_estimators]
+                self.var_estimators = [(self.var_matrix[i,i]*self.sigmasq) for i in range(self.k)]
+                self.se_estimators = [math.sqrt(var) for var in self.var_estimators]
 
-                self.tvalues = [self.t_contrast(i=i) for i in range(len(self.se_estimators))]
+                self.tvalues = self.t_contrast()
         
         def get_X_matrix(self):
                 '''
@@ -133,13 +133,16 @@ class ols:
                 return(pvalue)
 
 
-        def t_contrast(self, i):
+        def t_contrast(self):
                 '''
                 Returns p-value for t_contrast of individual significance of regressors.
                 '''
-                tvalue = self.B[i]/self.se_estimators
-                pvalue = t.pdf(tvalue, self.n-self.k)
-                return(pvalue)
+                array = []
+                for i in range(len(self.se_estimators)):
+                        tvalue = self.B[i]/self.se_estimators[i]
+                        pvalue = t.pdf(tvalue, self.n-self.k)
+                        array.append(float(pvalue))
+                return(array)
                 
                       
         def r2(self):
@@ -148,6 +151,13 @@ class ols:
                 '''
                 r2 = (self.sse/self.sst)
                 return(r2)
+        
+        def get_summary(self):
+                '''
+                Returns summary with the results
+                '''
+                return(print())
+                
 
 
 
@@ -157,5 +167,27 @@ if __name__ == '__main__':
         x = ["VOX_busc", "Ciudadanos_busc"]
 
         ls = ols(data, y, x)
-        ls.estimation
-        ls.B
+        ls.estimation #
+        ls.B # bien
+        ls.r2 # bien
+        math.sqrt(ls.residual_var) # bien
+        
+        ls.k # bien
+        ls.n # bien
+        
+        
+        
+        ls.sigma # puede
+        ls.sigmasq # puede
+        ls.var
+        math.sqrt(ls.var)
+        
+        ls.ssr # bien
+        ls.sse # bien
+        ls.sst # bien
+        
+        
+        ls.fvalue # puede
+        ls.var_estimators # bien
+        ls.se_estimators # bien
+        ls.tvalues # puede

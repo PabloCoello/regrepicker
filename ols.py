@@ -42,7 +42,10 @@ class ols:
                 self.se_estimators = [math.sqrt(var) for var in self.var_estimators]
 
                 self.tvalues = self.t_contrast()
-                self.summary = self.get_summary()
+                self.formula = self.get_summary_formula()
+                self.coefficients = self.get_summary_coefficients()
+                self.statistics = self.get_summary_statistics()
+                        
         
         def get_X_matrix(self):
                 '''
@@ -154,12 +157,17 @@ class ols:
                 r2 = (self.sse/self.sst)
                 return(r2)
         
-        def get_summary(self):
+        def get_summary_formula(self):
                 '''
                 Returns summary with the results
                 '''
                 # Formula
-                
+                regresor = ' + '.join(self.x_)
+                formula = self.y_+' = intercept + '+ regresor
+                return(formula)
+        
+        
+        def get_summary_coefficients(self):
                 # Coefficients table
                 table = []
                 names = self.x_
@@ -176,10 +184,21 @@ class ols:
                                                  'Estimate', 
                                                  'Std. Error', 
                                                  'pvalue (t-test)'])
-                # Residuals
+                return(coefficients)
+        
                 
+        def get_summary_statistics(self):
                 # Statistics
-                return(print(coefficients))
+                stat_name = ['Std. residual','R-squared','F-statistic']
+                statistics = tabulate([[stat_name[0], math.sqrt(self.residual_var)],
+                                       [stat_name[1], self.r2],
+                                       [stat_name[2], self.fvalue]],
+                                      headers=['Statistic', 'Value'])
+                return(statistics)
+        
+        def summary(self):
+                return(print(self.formula +'\n'+'\n'+ self.coefficients +'\n'+'\n'+ self.statistics))
+
                 
 
 
@@ -190,27 +209,4 @@ if __name__ == '__main__':
         x = ["VOX_busc", "Ciudadanos_busc"]
 
         ls = ols(data, y, x)
-        ls.estimation #
-        ls.B # bien
-        ls.r2 # bien
-        math.sqrt(ls.residual_var) # bien
-        
-        ls.k # bien
-        ls.n # bien
-        ls.x_
-        ls.summary
-        
-        ls.sigma # puede
-        ls.sigmasq # puede
-        ls.var
-        math.sqrt(ls.var)
-        
-        ls.ssr # bien
-        ls.sse # bien
-        ls.sst # bien
-        
-        
-        ls.fvalue # puede
-        ls.var_estimators # bien
-        ls.se_estimators # bien
-        ls.tvalues # puede
+        ls.summary()

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 from scipy.stats import f,t
+from tabulate import tabulate
 
 
 
@@ -41,6 +42,7 @@ class ols:
                 self.se_estimators = [math.sqrt(var) for var in self.var_estimators]
 
                 self.tvalues = self.t_contrast()
+                self.summary = self.get_summary()
         
         def get_X_matrix(self):
                 '''
@@ -156,7 +158,28 @@ class ols:
                 '''
                 Returns summary with the results
                 '''
-                return(print())
+                # Formula
+                
+                # Coefficients table
+                table = []
+                names = self.x_
+                names.append('intercept')
+                for i in range(len(names)):
+                        row = []
+                        row.append(names[i-1])
+                        row.append(float(self.B[i]))
+                        row.append(self.se_estimators[i])
+                        row.append(self.tvalues[i])
+                        table.append(row)
+                coefficients = tabulate(table,
+                                        headers=['Coefficients', 
+                                                 'Estimate', 
+                                                 'Std. Error', 
+                                                 'pvalue (t-test)'])
+                # Residuals
+                
+                # Statistics
+                return(print(coefficients))
                 
 
 
@@ -174,8 +197,8 @@ if __name__ == '__main__':
         
         ls.k # bien
         ls.n # bien
-        
-        
+        ls.x_
+        ls.summary
         
         ls.sigma # puede
         ls.sigmasq # puede
